@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_marginLeft="16dp"
+              android:layout_marginRight="16dp"
+              android:baselineAligned="false"
+              android:divider="?android:attr/dividerHorizontal"
+              android:orientation="horizontal"
+              android:showDividers="middle"
+              tools:context="app.mannit.nitin.com.bakingapp.RecipeDetailActivity">
+
+    <!--
+    This layout is a two-pane layout for the Recipes
+    master/detail flow.
+
+    -->
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:tools="http://schemas.android.com/tools"
+                  android:id="@+id/container"
+                  android:layout_margin="8dp"
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical">
+
+        <Button
+            android:id="@+id/ingredients"
+            style="?android:attr/textAppearanceLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:padding="16dp"
+            android:text="@string/ingredients"
+            tools:context="app.mannit.nitin.com.bakingapp.RecipeDetailFragment"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/step_detail_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"/>
+
+</LinearLayout>
