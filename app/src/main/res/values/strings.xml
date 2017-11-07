@@ -10,4 +10,5 @@
     <string name="action_done">Done</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="list_of_ingredients">Ingredients List</string>
+    <string name="appwidget_text">Ingredients List</string>
 </resources>

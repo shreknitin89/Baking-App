@@ -18,14 +18,17 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.io.InputStream;
+import org.parceler.Parcels;
+
 import java.util.List;
 
 import app.mannit.nitin.com.bakingapp.models.Baking;
 import app.mannit.nitin.com.bakingapp.models.Recipe;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * An activity representing a list of Recipes. This activity
@@ -37,6 +40,11 @@ import butterknife.ButterKnife;
  */
 public class RecipeListActivity extends AppCompatActivity {
 
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.recipe_list)
+    RecyclerView mRecyclerView;
+
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -45,38 +53,43 @@ public class RecipeListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
+        ButterKnife.bind(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
+        setSupportActionBar(mToolbar);
+        mToolbar.setTitle(getTitle());
 
-        View recyclerView = findViewById(R.id.recipe_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        setupRecyclerView();
     }
 
-    public String loadJSONFromAsset() {
-        String json = null;
-        try {
-            InputStream is = this.getAssets().open("recipe.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
+    private void setupRecyclerView() {
+        Call<Baking> call = Util.loadDataFromNetwork(this);
+        if (call != null) {
+            call.enqueue(new Callback<Baking>() {
+                @Override
+                public void onResponse(@NonNull retrofit2.Call<Baking> call, @NonNull Response<Baking> response) {
+                    Baking baking = response.body();
+                    if (baking != null) {
+                        setLayoutManager(baking);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Baking> call, @NonNull Throwable t) {
+                    Baking baking = new Gson().fromJson(Util.loadJSONFromAsset(RecipeListActivity.this), Baking.class);
+                    setLayoutManager(baking);
+                }
+            });
+        } else {
+            Baking baking = new Gson().fromJson(Util.loadJSONFromAsset(RecipeListActivity.this), Baking.class);
+            setLayoutManager(baking);
         }
-        return json;
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        Baking baking = new Gson().fromJson(loadJSONFromAsset(), Baking.class);
+    private void setLayoutManager(Baking baking) {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+            mRecyclerView.setLayoutManager(new GridLayoutManager(RecipeListActivity.this, 2));
         }
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, baking.getRecipes()));
+        mRecyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(RecipeListActivity.this, baking.getRecipes()));
     }
 
     public static class SimpleItemRecyclerViewAdapter
@@ -90,6 +103,7 @@ public class RecipeListActivity extends AppCompatActivity {
                 Recipe item = (Recipe) view.getTag();
                 Context context = view.getContext();
                 Intent intent = new Intent(context, RecipeDetailActivity.class);
+                intent.putExtra(Constants.RECIPES, Parcels.wrap(mValues));
                 intent.putExtra(Constants.RECIPE_ID, item.getId());
                 context.startActivity(intent);
             }

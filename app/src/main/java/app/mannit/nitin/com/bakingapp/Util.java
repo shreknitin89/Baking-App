@@ -1,9 +1,16 @@
 package app.mannit.nitin.com.bakingapp;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import app.mannit.nitin.com.bakingapp.models.Baking;
+import app.mannit.nitin.com.bakingapp.network.ApiBuilder;
+import app.mannit.nitin.com.bakingapp.network.ServiceGenerator;
+import retrofit2.Call;
 
 /**
  * Created by nitingeetasagardasari on 11/5/17 for the project BakingApp.
@@ -24,5 +31,21 @@ public class Util {
             return null;
         }
         return json;
+    }
+
+    public static boolean isOnline(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = null;
+        if (cm != null) {
+            netInfo = cm.getActiveNetworkInfo();
+        }
+        return netInfo != null && netInfo.isConnected();
+    }
+
+    public static Call<Baking> loadDataFromNetwork(Context activity) {
+        if (isOnline(activity)) {
+            return ServiceGenerator.createService(ApiBuilder.class, Constants.BASE_URL).getListOfRecipes();
+        }
+        return null;
     }
 }

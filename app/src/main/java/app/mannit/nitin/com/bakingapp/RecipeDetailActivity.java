@@ -20,12 +20,14 @@ import com.google.gson.Gson;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import app.mannit.nitin.com.bakingapp.models.Baking;
 import app.mannit.nitin.com.bakingapp.models.Ingredient;
 import app.mannit.nitin.com.bakingapp.models.Recipe;
 import app.mannit.nitin.com.bakingapp.models.Step;
+import app.mannit.nitin.com.bakingapp.widget.UpdateBakingService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -63,11 +65,22 @@ public class RecipeDetailActivity extends AppCompatActivity {
         if (mStepContainer != null) {
             mTwoPane = true;
         }
-        Baking baking = new Gson().fromJson(Util.loadJSONFromAsset(RecipeDetailActivity.this), Baking.class);
+
+        List<Recipe> recipes = Parcels.unwrap(getIntent().getParcelableExtra(Constants.RECIPES));
+        if (recipes == null || recipes.size() == 0) {
+            Baking baking = new Gson().fromJson(Util.loadJSONFromAsset(RecipeDetailActivity.this), Baking.class);
+            recipes = baking.getRecipes();
+        }
         final int position = getIntent().getIntExtra(Constants.RECIPE_ID, 0);
-        mItem = baking.getRecipes().get(position - 1);
+        mItem = recipes.get(position - 1);
         if (mItem != null) {
             this.setTitle(mItem.getName());
+            final List<Ingredient> ingredients = mItem.getIngredients();
+            ArrayList<String> ingredientsList = new ArrayList<>();
+            for (Ingredient ingredient : ingredients) {
+                ingredientsList.add(String.format("%s %s %s", ingredient.getQuantity(), ingredient.getMeasure(), ingredient.getIngredient()));
+            }
+            UpdateBakingService.startBakingService(this, ingredientsList);
             final List<Step> steps = mItem.getSteps();
             mRecyclerView.setAdapter(new RecipeDetailActivity.SimpleItemRecyclerViewAdapter(this, steps, mTwoPane));
         }

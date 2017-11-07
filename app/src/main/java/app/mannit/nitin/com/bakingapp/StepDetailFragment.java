@@ -134,11 +134,9 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     public void onPause() {
 
         super.onPause();
-
-        mResumeWindow = mExoPlayerView.getPlayer().getCurrentWindowIndex();
-        mResumePosition = Math.max(0, mExoPlayerView.getPlayer().getCurrentPosition());
-
         if (mExoPlayerView != null && mExoPlayerView.getPlayer() != null) {
+            mResumeWindow = mExoPlayerView.getPlayer().getCurrentWindowIndex();
+            mResumePosition = Math.max(0, mExoPlayerView.getPlayer().getCurrentPosition());
             mExoPlayerView.getPlayer().release();
         }
     }

@@ -32,7 +32,13 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.0'
 
+    // Okhttp and okio for
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    implementation 'com.squareup.okio:okio:1.13.0'
+
     // Retrofit library for building calls and parsing JSON responses
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 
     // Parceler to parcel the models
