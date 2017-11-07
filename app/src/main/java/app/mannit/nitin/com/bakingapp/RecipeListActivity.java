@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +25,7 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
+import app.mannit.nitin.com.bakingapp.IdlingResource.SimpleIdlingResource;
 import app.mannit.nitin.com.bakingapp.models.Baking;
 import app.mannit.nitin.com.bakingapp.models.Recipe;
 import butterknife.BindView;
@@ -44,6 +48,21 @@ public class RecipeListActivity extends AppCompatActivity {
     Toolbar mToolbar;
     @BindView(R.id.recipe_list)
     RecyclerView mRecyclerView;
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+
+    /**
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
+
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
