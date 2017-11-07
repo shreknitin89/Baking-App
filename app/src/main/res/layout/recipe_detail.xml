@@ -1,17 +1,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/container"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
 
-    <Button
+    <TextView
         android:id="@+id/ingredients"
-        style="?android:attr/textAppearanceLarge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:background="@android:color/black"
+        android:gravity="center"
         android:padding="16dp"
-        tools:context="app.mannit.nitin.com.bakingapp.RecipeDetailFragment"
-        android:text="@string/ingredients"/>
+        android:text="@string/ingredients"
+        android:textAllCaps="true"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@android:color/white" />
+
+    <include layout="@layout/recipe_list" />
+
 </LinearLayout>

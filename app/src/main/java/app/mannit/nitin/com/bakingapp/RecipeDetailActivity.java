@@ -7,13 +7,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -38,10 +39,8 @@ import butterknife.OnClick;
 public class RecipeDetailActivity extends AppCompatActivity {
     @BindView(R.id.detail_toolbar)
     Toolbar mToolbar;
-    @BindView(R.id.container)
-    LinearLayout mContainer;
-    @BindView(R.id.ingredients)
-    Button mIngredients;
+    @BindView(R.id.recipe_list)
+    RecyclerView mRecyclerView;
     @Nullable
     @BindView(R.id.step_detail_container)
     FrameLayout mStepContainer;
@@ -68,38 +67,9 @@ public class RecipeDetailActivity extends AppCompatActivity {
         final int position = getIntent().getIntExtra(Constants.RECIPE_ID, 0);
         mItem = baking.getRecipes().get(position - 1);
         if (mItem != null) {
+            this.setTitle(mItem.getName());
             final List<Step> steps = mItem.getSteps();
-            if (steps != null && steps.size() > 0) {
-                for (int i = 0; i < steps.size(); i++) {
-                    Button button = new Button(this);
-                    button.setText(String.format(getString(R.string.step_description), i + 1));
-                    button.setTextAppearance(this, android.R.style.TextAppearance_Large);
-                    button.setPadding(16, 16, 16, 16);
-                    LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    llp.setMargins(0, 0, 0, 8); // llp.setMargins(left, top, right, bottom);
-                    button.setLayoutParams(llp);
-                    final int stepPosition = i;
-                    button.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if (mTwoPane) {
-                                Bundle arguments = new Bundle();
-                                arguments.putParcelable(Constants.STEPS, Parcels.wrap(steps.get(stepPosition)));
-                                StepDetailFragment fragment = new StepDetailFragment();
-                                fragment.setArguments(arguments);
-                                getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.step_detail_container, fragment)
-                                        .commit();
-                            } else {
-                                Intent intent = new Intent(RecipeDetailActivity.this, StepActivity.class);
-                                intent.putExtra(Constants.STEPS, Parcels.wrap(steps.get(stepPosition)));
-                                startActivity(intent);
-                            }
-                        }
-                    });
-                    mContainer.addView(button);
-                }
-            }
+            mRecyclerView.setAdapter(new RecipeDetailActivity.SimpleItemRecyclerViewAdapter(this, steps, mTwoPane));
         }
     }
 
@@ -142,5 +112,67 @@ public class RecipeDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static class SimpleItemRecyclerViewAdapter
+            extends RecyclerView.Adapter<RecipeDetailActivity.SimpleItemRecyclerViewAdapter.ViewHolder> {
+
+        private final RecipeDetailActivity mParentActivity;
+        private final List<Step> mSteps;
+        private final boolean mTwoPane;
+        private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Step item = (Step) view.getTag();
+                if (mTwoPane) {
+                    Bundle arguments = new Bundle();
+                    arguments.putParcelable(Constants.STEPS, Parcels.wrap(item));
+                    StepDetailFragment fragment = new StepDetailFragment();
+                    fragment.setArguments(arguments);
+                    mParentActivity.getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.step_detail_container, fragment)
+                            .commit();
+                } else {
+                    Intent intent = new Intent(mParentActivity, StepActivity.class);
+                    intent.putExtra(Constants.STEPS, Parcels.wrap(item));
+                    mParentActivity.startActivity(intent);
+                }
+            }
+        };
+
+        SimpleItemRecyclerViewAdapter(RecipeDetailActivity parent, List<Step> item, boolean twoPane) {
+            mTwoPane = twoPane;
+            mSteps = item;
+            mParentActivity = parent;
+        }
+
+        @Override
+        public RecipeDetailActivity.SimpleItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(android.R.layout.simple_list_item_1, parent, false);
+            return new RecipeDetailActivity.SimpleItemRecyclerViewAdapter.ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final RecipeDetailActivity.SimpleItemRecyclerViewAdapter.ViewHolder holder, int position) {
+            holder.mIdView.setText(mSteps.get(position).getShortDescription());
+            holder.itemView.setTag(mSteps.get(position));
+            holder.itemView.setOnClickListener(mOnClickListener);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mSteps.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            @BindView(android.R.id.text1)
+            TextView mIdView;
+
+            ViewHolder(View view) {
+                super(view);
+                ButterKnife.bind(this, view);
+            }
+        }
     }
 }

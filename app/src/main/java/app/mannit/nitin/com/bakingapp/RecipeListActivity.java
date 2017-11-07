@@ -88,15 +88,6 @@ public class RecipeListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Recipe item = (Recipe) view.getTag();
-//                if (mTwoPane) {
-//                    Bundle arguments = new Bundle();
-//                    arguments.putInt(RecipeDetailFragment.ARG_ITEM_ID, item.getId());
-//                    RecipeDetailFragment fragment = new RecipeDetailFragment();
-//                    fragment.setArguments(arguments);
-//                    mParentActivity.getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.recipe_detail_container, fragment)
-//                            .commit();
-//                } else {
                 Context context = view.getContext();
                 Intent intent = new Intent(context, RecipeDetailActivity.class);
                 intent.putExtra(Constants.RECIPE_ID, item.getId());
