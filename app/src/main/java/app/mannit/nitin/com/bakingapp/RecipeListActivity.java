@@ -86,6 +86,7 @@ public class RecipeListActivity extends AppCompatActivity {
             call.enqueue(new Callback<Baking>() {
                 @Override
                 public void onResponse(@NonNull retrofit2.Call<Baking> call, @NonNull Response<Baking> response) {
+                    //This is the actual data coming from network
                     Baking baking = response.body();
                     if (baking != null) {
                         setLayoutManager(baking);
@@ -99,6 +100,7 @@ public class RecipeListActivity extends AppCompatActivity {
                 }
             });
         } else {
+            // This code is rather a safety check to continue the flow
             Baking baking = new Gson().fromJson(Util.loadJSONFromAsset(RecipeListActivity.this), Baking.class);
             setLayoutManager(baking);
         }

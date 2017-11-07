@@ -69,11 +69,15 @@ public class RecipeDetailActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+        //This is the actual data coming from network
         List<Recipe> recipes = Parcels.unwrap(getIntent().getParcelableExtra(Constants.RECIPES));
+
+        // This code is not actually reading from JSON, this is a safety check rather. The actual data comes from intent
         if (recipes == null || recipes.size() == 0) {
             Baking baking = new Gson().fromJson(Util.loadJSONFromAsset(RecipeDetailActivity.this), Baking.class);
             recipes = baking.getRecipes();
         }
+        //
         final int position = getIntent().getIntExtra(Constants.RECIPE_ID, 0);
         mItem = recipes.get(position - 1);
         if (mItem != null) {
