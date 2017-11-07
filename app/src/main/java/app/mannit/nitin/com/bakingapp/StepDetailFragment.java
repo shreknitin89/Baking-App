@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,19 +86,21 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             mResumeWindow = savedInstanceState.getInt(STATE_RESUME_WINDOW);
             mResumePosition = savedInstanceState.getLong(STATE_RESUME_POSITION);
         }
+        return rootView;
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
         if (mStep != null) {
             mDescription.setText(mStep.getDescription());
             String video = mStep.getVideoURL();
-            if (video != null && !video.isEmpty()) {
+            if (!TextUtils.isEmpty(video)) {
                 initializeMediaSession();
                 initializePlayer(Uri.parse(video));
             }
         }
-
-        return rootView;
     }
-
 
     /**
      * Initialize ExoPlayer.
@@ -106,16 +109,18 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
      */
     private void initializePlayer(Uri mediaUri) {
         if (mExoPlayer == null) {
-            // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
+
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(this.getContext(), trackSelector, loadControl);
             mExoPlayerView.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
+
             // Prepare the MediaSource.
             String userAgent = com.google.android.exoplayer2.util.Util.getUserAgent(this.getContext(), "Baking App");
+
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     this.getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
 
@@ -132,12 +137,23 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
     @Override
     public void onPause() {
-
         super.onPause();
         if (mExoPlayerView != null && mExoPlayerView.getPlayer() != null) {
             mResumeWindow = mExoPlayerView.getPlayer().getCurrentWindowIndex();
             mResumePosition = Math.max(0, mExoPlayerView.getPlayer().getCurrentPosition());
             mExoPlayerView.getPlayer().release();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mResumePosition = 0;
+        mResumeWindow = 0;
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
         }
     }
 
@@ -174,7 +190,6 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
         // Start the Media Session since the activity is active.
         mMediaSession.setActive(true);
-
     }
 
     @Override
