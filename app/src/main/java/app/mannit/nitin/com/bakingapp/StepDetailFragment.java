@@ -150,9 +150,8 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         super.onStop();
         mResumePosition = 0;
         mResumeWindow = 0;
-        if (mExoPlayer != null) {
-            mExoPlayer.stop();
-            mExoPlayer.release();
+        if (mExoPlayerView != null && mExoPlayerView.getPlayer() != null) {
+            mExoPlayerView.getPlayer().release();
             mExoPlayer = null;
         }
     }

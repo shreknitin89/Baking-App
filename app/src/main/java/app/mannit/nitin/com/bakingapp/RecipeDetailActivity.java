@@ -9,14 +9,17 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
 
@@ -162,13 +165,17 @@ public class RecipeDetailActivity extends AppCompatActivity {
         @Override
         public RecipeDetailActivity.SimpleItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(android.R.layout.simple_list_item_1, parent, false);
+                    .inflate(R.layout.step_detail_layout, parent, false);
             return new RecipeDetailActivity.SimpleItemRecyclerViewAdapter.ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(final RecipeDetailActivity.SimpleItemRecyclerViewAdapter.ViewHolder holder, int position) {
             holder.mIdView.setText(mSteps.get(position).getShortDescription());
+            String thumbnail = mSteps.get(position).getThumbnailURL();
+            if (!TextUtils.isEmpty(thumbnail)) {
+                Picasso.with(mParentActivity).load(thumbnail).error(R.drawable.place_holder).into(holder.mImageView);
+            }
             holder.itemView.setTag(mSteps.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
         }
@@ -179,8 +186,10 @@ public class RecipeDetailActivity extends AppCompatActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            @BindView(android.R.id.text1)
+            @BindView(R.id.text1)
             TextView mIdView;
+            @BindView(R.id.imageView)
+            ImageView mImageView;
 
             ViewHolder(View view) {
                 super(view);

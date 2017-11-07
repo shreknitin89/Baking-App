@@ -42,7 +42,7 @@ public class GridWidgetService extends RemoteViewsService {
 
         @Override
         public int getCount() {
-            return ingredients.size();
+            return ingredients != null ? ingredients.size() : 0;
         }
 
         @Override
@@ -74,6 +74,5 @@ public class GridWidgetService extends RemoteViewsService {
             return true;
         }
     }
-
 }
 
