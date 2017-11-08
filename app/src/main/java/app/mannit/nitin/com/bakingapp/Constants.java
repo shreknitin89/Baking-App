@@ -11,5 +11,7 @@ public class Constants {
     public static final String BASE_URL = "https://d17h27t6h515a5.cloudfront.net";
     public static final String UPDATE = "android.appwidget.action.APPWIDGET_UPDATE";
     public static final String RECIPES = "recipes";
+    public static final String LAYOUT_MANAGER_STATE = "LAYOUT_MANAGER_STATE";
+    public static final String RECIPE_LIST = "RECIPE_LIST";
     public static String INGREDIENTS_LIST = "INGREDIENTS_LIST";
 }

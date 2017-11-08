@@ -2,11 +2,13 @@ package app.mannit.nitin.com.bakingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -42,6 +44,7 @@ import butterknife.OnClick;
  * in a {@link RecipeListActivity}.
  */
 public class RecipeDetailActivity extends AppCompatActivity {
+    private static Parcelable mListState;
     @BindView(R.id.detail_toolbar)
     Toolbar mToolbar;
     @BindView(R.id.recipe_list)
@@ -51,6 +54,9 @@ public class RecipeDetailActivity extends AppCompatActivity {
     FrameLayout mStepContainer;
     private boolean mTwoPane;
     private Recipe mItem;
+    private LinearLayoutManager mLinearLayoutManager;
+    private List<Recipe> mRecipes;
+    private List<Step> mSteps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,26 +76,27 @@ public class RecipeDetailActivity extends AppCompatActivity {
         }
 
         //This is the actual data coming from network
-        List<Recipe> recipes = Parcels.unwrap(getIntent().getParcelableExtra(Constants.RECIPES));
+        mRecipes = Parcels.unwrap(getIntent().getParcelableExtra(Constants.RECIPES));
 
         // This code is not actually reading from JSON, this is a safety check rather. The actual data comes from intent
-        if (recipes == null || recipes.size() == 0) {
+        if (mRecipes == null || mRecipes.size() == 0) {
             Baking baking = new Gson().fromJson(Util.loadJSONFromAsset(RecipeDetailActivity.this), Baking.class);
-            recipes = baking.getRecipes();
+            mRecipes = baking.getRecipes();
         }
         //
         final int position = getIntent().getIntExtra(Constants.RECIPE_ID, 0);
-        mItem = recipes.get(position - 1);
-        if (mItem != null) {
-            this.setTitle(mItem.getName());
-            final List<Ingredient> ingredients = mItem.getIngredients();
-            ArrayList<String> ingredientsList = new ArrayList<>();
-            for (Ingredient ingredient : ingredients) {
-                ingredientsList.add(String.format("%s %s %s", ingredient.getQuantity(), ingredient.getMeasure(), ingredient.getIngredient()));
-            }
-            UpdateBakingService.startBakingService(this, ingredientsList);
-            final List<Step> steps = mItem.getSteps();
-            mRecyclerView.setAdapter(new RecipeDetailActivity.SimpleItemRecyclerViewAdapter(this, steps, mTwoPane));
+            mItem = mRecipes.get(position - 1);
+            if (mItem != null) {
+                this.setTitle(mItem.getName());
+                final List<Ingredient> ingredients = mItem.getIngredients();
+                ArrayList<String> ingredientsList = new ArrayList<>();
+                for (Ingredient ingredient : ingredients) {
+                    ingredientsList.add(String.format("%s %s %s", ingredient.getQuantity(), ingredient.getMeasure(), ingredient.getIngredient()));
+                }
+                UpdateBakingService.startBakingService(this, ingredientsList);
+                mSteps = mItem.getSteps();
+                mLinearLayoutManager = new LinearLayoutManager(this);
+                mRecyclerView.setLayoutManager(mLinearLayoutManager);
         }
     }
 
@@ -119,6 +126,21 @@ public class RecipeDetailActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mListState = mLinearLayoutManager.onSaveInstanceState();
+        outState.putParcelable(Constants.LAYOUT_MANAGER_STATE, mListState);
+        outState.putParcelable(Constants.RECIPE_LIST, Parcels.wrap(mRecipes));
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mListState = savedInstanceState.getParcelable(Constants.LAYOUT_MANAGER_STATE);
+        mRecipes = Parcels.unwrap(savedInstanceState.getParcelable(Constants.RECIPE_LIST));
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
@@ -132,6 +154,17 @@ public class RecipeDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mListState != null) {
+            mLinearLayoutManager.onRestoreInstanceState(mListState);
+            mRecyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, mSteps, mTwoPane));
+        } else {
+            mRecyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, mSteps, mTwoPane));
+        }
     }
 
     public static class SimpleItemRecyclerViewAdapter
