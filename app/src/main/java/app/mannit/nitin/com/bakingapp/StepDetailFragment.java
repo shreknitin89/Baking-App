@@ -1,15 +1,18 @@
 package app.mannit.nitin.com.bakingapp;
 
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.C;
@@ -98,6 +101,9 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             if (!TextUtils.isEmpty(video)) {
                 initializeMediaSession();
                 initializePlayer(Uri.parse(video));
+            } else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mExoPlayerView.setLayoutParams(new LinearLayout.LayoutParams(300, 300));
+                mExoPlayerView.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ic_visibility_off_white_36dp));
             }
         }
     }
