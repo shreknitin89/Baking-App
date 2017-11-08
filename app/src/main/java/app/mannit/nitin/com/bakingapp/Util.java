@@ -6,8 +6,9 @@ import android.net.NetworkInfo;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
-import app.mannit.nitin.com.bakingapp.models.Baking;
+import app.mannit.nitin.com.bakingapp.models.Recipe;
 import app.mannit.nitin.com.bakingapp.network.ApiBuilder;
 import app.mannit.nitin.com.bakingapp.network.ServiceGenerator;
 import retrofit2.Call;
@@ -42,7 +43,7 @@ public class Util {
         return netInfo != null && netInfo.isConnected();
     }
 
-    public static Call<Baking> loadDataFromNetwork(Context activity) {
+    public static Call<List<Recipe>> loadDataFromNetwork(Context activity) {
         if (isOnline(activity)) {
             return ServiceGenerator.createService(ApiBuilder.class, Constants.BASE_URL).getListOfRecipes();
         }

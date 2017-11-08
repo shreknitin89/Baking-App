@@ -81,20 +81,20 @@ public class RecipeListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        Call<Baking> call = Util.loadDataFromNetwork(this);
+        Call<List<Recipe>> call = Util.loadDataFromNetwork(this);
         if (call != null) {
-            call.enqueue(new Callback<Baking>() {
+            call.enqueue(new Callback<List<Recipe>>() {
                 @Override
-                public void onResponse(@NonNull retrofit2.Call<Baking> call, @NonNull Response<Baking> response) {
+                public void onResponse(@NonNull Call<List<Recipe>> call, @NonNull Response<List<Recipe>> response) {
                     //This is the actual data coming from network
-                    Baking baking = response.body();
-                    if (baking != null) {
-                        setLayoutManager(baking);
-                    }
+                    List<Recipe> recipes = response.body();
+                    Baking baking = new Baking();
+                    baking.setRecipes(recipes);
+                    setLayoutManager(baking);
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<Baking> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<List<Recipe>> call, @NonNull Throwable t) {
                     Baking baking = new Gson().fromJson(Util.loadJSONFromAsset(RecipeListActivity.this), Baking.class);
                     setLayoutManager(baking);
                 }
