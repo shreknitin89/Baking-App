@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:4.2.2'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -26,12 +26,12 @@ task clean(type: Delete) {
 }
 
 ext {
-    support_library = "27.1.0"
-    butterknife = "8.8.1"
-    okhttp = "3.9.0"
-    parceler = "1.1.10"
-    retrofit = "2.3.0"
-    picasso = "2.5.2"
-    exoplayer = "2.7.0"
-    espresso = "3.0.1"
+    multidex_version = "2.0.1"
+    butterknife = "10.0.0"
+    okhttp = "3.14.9"
+    parceler = "1.1.13"
+    retrofit = "2.9.0"
+    picasso = "2.8"
+    exoplayer = "2.14.2"
+    espresso = "3.4.0"
 }

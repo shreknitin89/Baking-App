@@ -8,20 +8,20 @@
     android:orientation="horizontal"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+    <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/playerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/step_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:gravity="center"
-        android:textColor="@android:color/white"
         android:textAppearance="?android:textAppearanceLarge"
-        tools:text="Text"/>
+        android:textColor="@android:color/white"
+        tools:text="Text" />
 
 </LinearLayout>

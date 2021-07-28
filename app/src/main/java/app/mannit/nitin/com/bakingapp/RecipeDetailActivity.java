@@ -3,14 +3,6 @@ package app.mannit.nitin.com.bakingapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,6 +11,15 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -85,18 +86,18 @@ public class RecipeDetailActivity extends AppCompatActivity {
         }
         //
         final int position = getIntent().getIntExtra(Constants.RECIPE_ID, 0);
-            mItem = mRecipes.get(position - 1);
-            if (mItem != null) {
-                this.setTitle(mItem.getName());
-                final List<Ingredient> ingredients = mItem.getIngredients();
-                ArrayList<String> ingredientsList = new ArrayList<>();
-                for (Ingredient ingredient : ingredients) {
-                    ingredientsList.add(String.format("%s %s %s", ingredient.getQuantity(), ingredient.getMeasure(), ingredient.getIngredient()));
-                }
-                UpdateBakingService.startBakingService(this, ingredientsList);
-                mSteps = mItem.getSteps();
-                mLinearLayoutManager = new LinearLayoutManager(this);
-                mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mItem = mRecipes.get(position - 1);
+        if (mItem != null) {
+            this.setTitle(mItem.getName());
+            final List<Ingredient> ingredients = mItem.getIngredients();
+            ArrayList<String> ingredientsList = new ArrayList<>();
+            for (Ingredient ingredient : ingredients) {
+                ingredientsList.add(String.format("%s %s %s", ingredient.getQuantity(), ingredient.getMeasure(), ingredient.getIngredient()));
+            }
+            UpdateBakingService.startBakingService(this, ingredientsList);
+            mSteps = mItem.getSteps();
+            mLinearLayoutManager = new LinearLayoutManager(this);
+            mRecyclerView.setLayoutManager(mLinearLayoutManager);
         }
     }
 
@@ -159,7 +160,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(mListState != null) {
+        if (mListState != null) {
             mLinearLayoutManager.onRestoreInstanceState(mListState);
             mRecyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, mSteps, mTwoPane));
         } else {
@@ -211,7 +212,10 @@ public class RecipeDetailActivity extends AppCompatActivity {
             holder.mIdView.setText(mSteps.get(position).getShortDescription());
             String thumbnail = mSteps.get(position).getThumbnailURL();
             if (!TextUtils.isEmpty(thumbnail)) {
-                Picasso.with(mParentActivity).load(thumbnail).error(R.drawable.place_holder).into(holder.mImageView);
+                Picasso.get()
+                        .load(thumbnail)
+                        .error(R.drawable.place_holder)
+                        .into(holder.mImageView);
             }
             holder.itemView.setTag(mSteps.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);

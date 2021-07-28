@@ -3,9 +3,6 @@ package app.mannit.nitin.com.bakingapp;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
@@ -15,18 +12,20 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.C;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
@@ -39,6 +38,8 @@ import org.parceler.Parcels;
 import app.mannit.nitin.com.bakingapp.models.Step;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.google.android.exoplayer2.C.INDEX_UNSET;
 
 /**
  * Created by nitingeetasagardasari on 11/5/17 for the project BakingApp.
@@ -119,7 +120,10 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
 
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(this.getContext(), trackSelector, loadControl);
+            mExoPlayer = new SimpleExoPlayer.Builder(this.getContext())
+                    .setTrackSelector(trackSelector)
+                    .setLoadControl(loadControl)
+                    .build();
             mExoPlayerView.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
@@ -128,10 +132,11 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             // Prepare the MediaSource.
             String userAgent = com.google.android.exoplayer2.util.Util.getUserAgent(this.getContext(), "Baking App");
 
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    this.getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+            DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(
+                    this.getContext(), userAgent);
+            MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaUri);
 
-            boolean haveResumePosition = mResumeWindow != C.INDEX_UNSET;
+            boolean haveResumePosition = mResumeWindow != INDEX_UNSET;
 
             if (haveResumePosition) {
                 mExoPlayerView.getPlayer().seekTo(mResumeWindow, mResumePosition);

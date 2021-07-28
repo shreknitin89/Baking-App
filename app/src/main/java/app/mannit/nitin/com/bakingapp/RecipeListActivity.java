@@ -4,19 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.support.test.espresso.IdlingResource;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.IdlingResource;
 
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -148,7 +149,7 @@ public class RecipeListActivity extends AppCompatActivity {
             if (imagePath == null || imagePath.isEmpty()) {
                 holder.mImageView.setImageResource(R.drawable.place_holder);
             } else {
-                Picasso.with(mParentActivity)
+                Picasso.get()
                         .load(imagePath)
                         .error(R.drawable.place_holder)
                         .into(holder.mImageView);
